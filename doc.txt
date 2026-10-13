@@ -1,0 +1,2 @@
+Download folder scan: wget https://raw.githubusercontent.com/maynul-soft/linux-command/main/folder_scan.py
+clone repo: git clone https://github.com/maynul-soft/linux-command
