@@ -1,0 +1,63 @@
+Change paw command:  passwd
+Rename file:   mv old_name.txt new_name.txt
+
+=============File scan Shell Script =================== 
+
+--------------shel----------------------
+
+find . -type f -name "*.dart" -exec sh -c '
+  for file do
+    # ফাইলটিতে package main বা func main আছে কিনা চেক করা (যা Go-তে থাকে)
+    if grep -qE "(package main|func main)" "$file"; then
+      echo "[!] Mismatch: $file (Actual: Go Source Code, but named as .dart)"
+    fi
+  done
+' sh {} +
+
+
+------------shel--------------
+
+=======File Scan by python=======
+
+Step 1: create python file <example.py>
+Step 2: Go to nano view
+Step 3: Pest This python value save and exit
+
+Code --------------------------------
+
+
+import os
+import mimetypes
+import subprocess
+
+def get_real_mime(file_path):
+    try:
+        output = subprocess.check_output(['file', '--mime-type', '-b', file_path])
+        return output.decode('utf-8').strip()
+    except Exception:
+        return None
+
+print("Scanning files and sub-folders...\n" + "-"*50)
+
+for root, dirs, files in os.walk('.'):
+    for filename in files:
+        filepath = os.path.join(root, filename)
+        
+        # আসল MIME টাইপ বের করা
+        real_mime = get_real_mime(filepath)
+        # এক্সটেনশন অনুযায়ী সাধারণ MIME টাইপ অনুমান করা
+        expected_mime, _ = mimetypes.guess_type(filepath)
+
+        if real_mime and expected_mime:
+            # প্রধান টাইপ চেক করা (যেমন image vs application)
+            if real_mime.split('/')[0] != expected_mime.split('/')[0] or real_mime != expected_mime:
+                # টেক্সট / প্লেইন ফাইলের ক্ষেত্রে ফলস অ্যালার্ম এড়ানোর ফিল্টার
+                if "text/" in real_mime and "text/" in expected_mime:
+                    continue
+                print(f"[!] Ext mismatch found: {filepath}")
+                print(f"    - Filename Extension suggests : {expected_mime}")
+                print(f"    - Actual File Header says     : {real_mime}\n")
+
+--------code----------------------------------------
+
+Step 4: python3 example.py
